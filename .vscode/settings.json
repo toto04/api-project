@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "__config": "c",
+        "__hash_table": "c",
+        "__locale": "c",
+        "__string": "c",
+        "tuple": "c",
+        "version": "c"
+    }
+}

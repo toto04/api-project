@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: gcc compila il file attivo",
+            "label": "gcc: build",
             "command": "/usr/bin/gcc",
             "args": [
                 "-Wall",
@@ -11,9 +11,9 @@
                 "-g3",
                 "-fdiagnostics-color=always",
                 "-g",
-                "${file}",
+                "${workspaceFolder}/source.c",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}.out"
+                "${workspaceFolder}/a.out"
             ],
             "options": {
                 "cwd": "${fileDirname}"

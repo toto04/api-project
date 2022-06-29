@@ -3,5 +3,30 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": []
+    "configurations": [
+        {
+            "name": "C++ Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/a.out",
+            "environment": [{ "name": "config", "value": "Debug" }],
+            "internalConsoleOptions": "openOnSessionStart",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "lldb",
+            "miDebuggerPath": "${userHome}/.vscode/extensions/ms-vscode.cpptools-1.11.0-darwin-arm64/debugAdapters/lldb-mi/bin/lldb-mi",
+            "preLaunchTask": "gcc: build",
+            "setupCommands": [
+                {
+                    "text": "rm -rf ${workspaceFolder}/output.txt"
+                },
+                {
+                    // not sure what this exactly does but seems to work
+                    "text": "settings set target.input-path ${workspaceFolder}/input.txt"
+                },
+                {
+                    "text": "settings set target.output-path ${workspaceFolder}/output.txt"
+                }
+            ]
+        }
+    ]
 }
