@@ -7,7 +7,7 @@
             "args": [
                 "-Wall",
                 "-Werror",
-                "-O2",
+                // "-O2",
                 "-g3",
                 "-fdiagnostics-color=always",
                 "-g",
