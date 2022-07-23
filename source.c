@@ -39,16 +39,16 @@ unsigned short letter_to_index(char c) {
     return c;
 }
 
-char index_to_letter(unsigned short i) {
-    if (i == 0)
-        return '-';
-    if (i < 11)
-        return i + '0' - 1;
-    if (i < 37) return i + 'A' - 11;
-    if (i == 37)
-        return '_';
-    return i + 'a' - 38;
-}
+// char index_to_letter(unsigned short i) {
+//     if (i == 0)
+//         return '-';
+//     if (i < 11)
+//         return i + '0' - 1;
+//     if (i < 37) return i + 'A' - 11;
+//     if (i == 37)
+//         return '_';
+//     return i + 'a' - 38;
+// }
 
 // unsigned short* create_letter_table() {
 //     static unsigned short table[64];
@@ -62,7 +62,7 @@ typedef struct letter_node {
     bool unviable;
     struct letter_node* next;
     struct letter_node* inner;
-} letter_node;
+} __attribute__((packed)) letter_node;
 
 /**
  * @brief creates a new node with the correct letter, just a wrapper to set everything correctly
@@ -343,7 +343,7 @@ void print_inner(letter_node* node, char* word, int depth) {
  * @brief prints the filtered word list
  */
 void print_words() {
-    char* word = malloc(word_length);
+    char* word = malloc(sizeof(char) * word_length + 1);
     print_inner(vocabulary, word, 0);
     free(word);
 }
@@ -378,8 +378,11 @@ void parse_command(char* cmd) {
         // clear the viability
         clear_viability(vocabulary);
         // set the word
+        if (the_word) free(the_word);
         the_word = malloc(sizeof(char) * (word_length + 1));
-        strncpy(the_word, read_line(), word_length);
+        char* l = read_line();
+        strncpy(the_word, l, word_length);
+        free(l);
         // count each letter
         for (int i = 0; i < 64; i++) char_count[i] = 0;
         for (int i = 0; i < word_length; i++) {
@@ -389,7 +392,9 @@ void parse_command(char* cmd) {
         }
 
         // set number of guesses
-        guesses = atoi(read_line());
+        l = read_line();
+        guesses = atoi(l);
+        free(l);
         // start the game
         playing = true;
     } else if (strcmp(cmd, "+inserisci_inizio") == 0) {
@@ -406,8 +411,9 @@ void parse_command(char* cmd) {
 
 int main(int argc, char* argv[]) {
     // firts thing: load the word length
-    word_length = atoi(read_line());
-    char* line;
+    char* line = read_line();
+    word_length = atoi(line);
+    free(line);
 
     while ((line = read_line()) != NULL) {
         if (line[0] == '+') {
@@ -418,7 +424,8 @@ int main(int argc, char* argv[]) {
             bool exact = true;
             if (word_exists(line)) {
                 unsigned int printed_char_count[64] = {0};
-                char* response = malloc(sizeof(char) * word_length);
+                char* response = malloc(sizeof(char) * word_length + 1);
+                response[word_length] = '\0';
 
                 for (unsigned int i = 0; i < word_length; i++) {
                     char c = line[i];
@@ -466,13 +473,11 @@ int main(int argc, char* argv[]) {
                     // the word is found
                     puts("ok");
                     playing = false;
-                    continue;
                 } else {
                     update_viability();  // update the viability of the letters
 
                     // prints the response
                     puts(response);
-                    free(response);
                     // prints how many words are remaining
                     int viable_words = count_viable_words(vocabulary);
                     printf("%d\n", viable_words);
@@ -482,9 +487,10 @@ int main(int argc, char* argv[]) {
                         // no more guesses, game lost
                         puts("ko");
                         playing = false;
-                        continue;
                     }
                 }
+
+                free(response);
             } else {
                 puts("not_exists");
             }
