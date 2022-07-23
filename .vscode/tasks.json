@@ -7,6 +7,7 @@
             "args": [
                 "-Wall",
                 "-Werror",
+                // "-Og",
                 // "-O2",
                 "-g3",
                 "-fdiagnostics-color=always",
@@ -15,15 +16,22 @@
                 "-o",
                 "${workspaceFolder}/a.out"
             ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
+            // "options": {
+            //     "cwd": "${fileDirname}"
+            // },
             "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Attività generata dal debugger."
+            "detail": "Attività generata dal debugger.",
+            "dependsOn": ["delete output.txt"]
+        },
+        {
+            "type": "shell",
+            "label": "delete output.txt",
+            "command": "rm",
+            "args": ["-f", "${workspaceFolder}/output.txt"]
         }
     ],
     "version": "2.0.0"

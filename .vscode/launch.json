@@ -13,12 +13,9 @@
             "internalConsoleOptions": "openOnSessionStart",
             "cwd": "${workspaceFolder}",
             "MIMode": "lldb",
-            "miDebuggerPath": "${userHome}/.vscode/extensions/ms-vscode.cpptools-1.11.0-darwin-arm64/debugAdapters/lldb-mi/bin/lldb-mi",
+            "miDebuggerPath": "${userHome}/.vscode/extensions/ms-vscode.cpptools-1.11.4-darwin-arm64/debugAdapters/lldb-mi/bin/lldb-mi",
             "preLaunchTask": "gcc: build",
             "setupCommands": [
-                {
-                    "text": "rm -rf ${workspaceFolder}/output.txt"
-                },
                 {
                     // not sure what this exactly does but seems to work
                     "text": "settings set target.input-path ${workspaceFolder}/input.txt"
