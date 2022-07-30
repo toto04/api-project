@@ -8,6 +8,7 @@ char* the_word = NULL;
 unsigned int word_length;
 unsigned int char_count[64];
 int guesses = 0;
+int viable_count = 0;
 
 /** UTILS **/
 
@@ -278,6 +279,10 @@ void clear_viability(letter_node* node) {
 }
 
 void update_viability_inner(letter_node* node, unsigned int* letter_count, int depth) {
+    if (node == NULL) {
+        viable_count++;
+        return;
+    }
     while (node != NULL) {
         unsigned short idx = letter_to_index(node->letter);
         letter_count[idx]++;
@@ -289,6 +294,7 @@ void update_viability_inner(letter_node* node, unsigned int* letter_count, int d
 }
 
 void update_viability() {
+    viable_count = 0;
     letter_node* node = vocabulary;
     unsigned int letter_count[64] = {0};
     update_viability_inner(node, letter_count, 0);
@@ -346,21 +352,6 @@ void print_words() {
     char* word = malloc(sizeof(char) * word_length + 1);
     print_inner(vocabulary, word, 0);
     free(word);
-}
-
-int count_viable_words(letter_node* node) {
-    unsigned int c = 0;
-    while (node != NULL) {
-        if (!node->unviable) {
-            if (node->inner == NULL) {
-                c++;
-            } else {
-                c += count_viable_words(node->inner);
-            }
-        }
-        node = node->next;
-    }
-    return c;
 }
 
 /**
@@ -479,8 +470,7 @@ int main(int argc, char* argv[]) {
                     // prints the response
                     puts(response);
                     // prints how many words are remaining
-                    int viable_words = count_viable_words(vocabulary);
-                    printf("%d\n", viable_words);
+                    printf("%d\n", viable_count);
                     guesses--;
 
                     if (guesses == 0) {
