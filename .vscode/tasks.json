@@ -7,31 +7,37 @@
             "args": [
                 "-Wall",
                 "-Werror",
-                // "-Og",
-                // "-O2",
                 "-g3",
                 "-fdiagnostics-color=always",
                 "-g",
-                "${workspaceFolder}/source.c",
+                "${workspaceFolder}/main.c",
                 "-o",
                 "${workspaceFolder}/a.out"
             ],
-            // "options": {
-            //     "cwd": "${fileDirname}"
-            // },
             "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "detail": "Attività generata dal debugger.",
-            "dependsOn": ["delete output.txt"]
+            "dependsOn": ["delete output.txt"],
+            "dependsOrder": "sequence"
         },
         {
             "type": "shell",
             "label": "delete output.txt",
             "command": "rm",
             "args": ["-f", "${workspaceFolder}/output.txt"]
+        },
+        {
+            "type": "shell",
+            "label": "merge",
+            "command": "mergec",
+            "args": [
+                "${workspaceFolder}/main.c",
+                "${workspaceFolder}/SUBMIT.c"
+            ],
+            "problemMatcher": []
         }
     ],
     "version": "2.0.0"

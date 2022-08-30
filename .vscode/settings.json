@@ -5,6 +5,8 @@
         "__locale": "c",
         "__string": "c",
         "tuple": "c",
-        "version": "c"
-    }
+        "version": "c",
+        "stdbool.h": "c"
+    },
+    "C_Cpp.clang_format_sortIncludes": false
 }

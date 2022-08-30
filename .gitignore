@@ -1,6 +1,7 @@
 *.DS_Store
 input.txt
 output.txt
+SUBMIT.c
 
 # Prerequisites
 *.d
