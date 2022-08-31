@@ -40,14 +40,16 @@ void append_word(char* word) {
     letter_node* node = vocabulary;
     letter_node* parent = NULL;
     unsigned int letter_count[64] = {0};
+    bool already_unviable = false;
     for (int i = 0; i < word_length; i++) {
         letter_count[letter_to_index(word[i])]++;
         if (i) {
             // once the correct node is found, proceed with inserting the next one
             // only after the first word
             if (node->inner == NULL) {
-                node->inner = new_node(word[i], check_viability(word[i], letter_count, i));
+                node->inner = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
             }
+            already_unviable = already_unviable && node->unviable;
             parent = node;
             node = node->inner;
         }
@@ -56,15 +58,15 @@ void append_word(char* word) {
             // navigate through the letters until the correct one is either found or inserted
 
             if (node->letter > word[i]) {
-                letter_node* nn = new_node(word[i], check_viability(word[i], letter_count, i));
+                letter_node* nn = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
                 nn->next = node;
                 node = nn;
                 parent->inner = node;
             } else if (node->next == NULL) {
-                node->next = new_node(word[i], check_viability(word[i], letter_count, i));
+                node->next = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
                 node = node->next;
             } else if (node->next->letter > word[i]) {
-                letter_node* nn = new_node(word[i], check_viability(word[i], letter_count, i));
+                letter_node* nn = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
                 nn->next = node->next;
                 node->next = nn;
                 node = nn;
@@ -140,4 +142,13 @@ void update_viability() {
     letter_node* node = vocabulary;
     unsigned int letter_count[64] = {0};
     update_viability_inner(node, letter_count, 0);
+}
+
+/**
+ * @brief prints the filtered word list
+ */
+void print_words() {
+    char* word = malloc(sizeof(char) * word_length + 1);
+    print_inner(vocabulary, word, 0);
+    free(word);
 }

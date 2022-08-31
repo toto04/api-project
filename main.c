@@ -25,15 +25,6 @@ bool word_exists(char* word) {
 }
 
 /**
- * @brief prints the filtered word list
- */
-void print_words() {
-    char* word = malloc(sizeof(char) * word_length + 1);
-    print_inner(vocabulary, word, 0);
-    free(word);
-}
-
-/**
  * @brief parse a command from an stdin line, and executes it
  * @param command the line from stdin
  */
