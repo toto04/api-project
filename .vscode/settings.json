@@ -6,7 +6,8 @@
         "__string": "c",
         "tuple": "c",
         "version": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "__node_handle": "c"
     },
     "C_Cpp.clang_format_sortIncludes": false
 }
