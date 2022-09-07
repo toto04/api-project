@@ -10,20 +10,6 @@
 
 /** MAIN **/
 
-bool word_exists(char* word) {
-    letter_node* node = vocabulary;
-    for (int i = 0; i < word_length; i++) {
-        char letter = word[i];
-        while (node->letter != letter) {
-            if (node->next == NULL)
-                return false;
-            node = node->next;
-        }
-        node = node->inner;
-    }
-    return true;
-}
-
 /**
  * @brief parse a command from an stdin line, and executes it
  * @param command the line from stdin
@@ -37,7 +23,7 @@ void parse_command(char* cmd) {
         // initialize the constraints
         initialize_contraints();
         // clear the viability
-        clear_viability(vocabulary);
+        clear_viability(vocabulary, 0);
         // set the word
         if (the_word) free(the_word);
         the_word = malloc(sizeof(char) * (word_length + 1));
@@ -60,10 +46,11 @@ void parse_command(char* cmd) {
         playing = true;
     } else if (strcmp(cmd, "+inserisci_inizio") == 0) {
         // go back to inserting
+        playing_prev = playing;
         playing = false;
     } else if (strcmp(cmd, "+inserisci_fine") == 0) {
         // resume the game
-        playing = true;
+        playing = playing_prev;
         // recalculate the viability of the letters
     } else if (strcmp(cmd, "+stampa_filtrate") == 0) {
         print_words();
@@ -75,6 +62,8 @@ int main(int argc, char* argv[]) {
     char* line = read_line();
     word_length = atoi(line);
     free(line);
+
+    initialize_contraints();  // just to be sure
 
     while ((line = read_line()) != NULL) {
         if (line[0] == '+') {

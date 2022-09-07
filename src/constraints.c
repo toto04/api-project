@@ -1,3 +1,10 @@
+#ifndef CONSTRAINTS
+#define CONSTRAINTS
+
+#include <stdlib.h>
+#include <stdbool.h>
+#include "globals.c"
+
 typedef struct impossible_node {
     char letter;
     struct impossible_node* next;
@@ -64,3 +71,5 @@ void append_impossible_char(unsigned short pos, char c) {
         constraints.impossible_chars[pos].tail = node;
     }
 }
+
+#endif

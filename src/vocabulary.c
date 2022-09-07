@@ -1,3 +1,4 @@
+#include "constraints.c"
 #include "nodes.c"
 
 /**
@@ -22,58 +23,52 @@ bool check_viability(char letter, unsigned int* letter_count, int depth);
  *
  * @param node the node to be cleared
  */
-void clear_viability(letter_node* node);
+void clear_viability(letter_node* node, unsigned depth);
 
 void append_word(char* word) {
     if (vocabulary == NULL) {
-        // initialize the vocab if it's empty
-        vocabulary = new_node(word[0], false);
+        vocabulary = new_node(word, 0);
+        return;
     }
 
-    if (vocabulary->letter > word[0]) {
-        // shift the vocab if the first letter is too big
-        letter_node* n = vocabulary;
-        vocabulary = new_node(word[0], false);
-        vocabulary->next = n;
-    }
-
-    letter_node* node = vocabulary;
-    letter_node* parent = NULL;
+    letter_node* current_node = vocabulary;
+    unsigned current_depth = 0;
     unsigned int letter_count[64] = {0};
-    bool already_unviable = false;
-    for (int i = 0; i < word_length; i++) {
+    // bool already_unviable = false;
+    for (int i = 0; i < word_length;) {
+        letter_node* n = &(current_node[i - current_depth]);
+        if (word[i] > n->letter) {
+            if (n->next == NULL) {
+                n->next = new_node(&(word[i]), i);
+                for (int j = i; j < word_length; j++) {
+                    letter_node* nn = &(n->next[j - i]);
+                    letter_count[letter_to_index(word[j])]++;
+                    bool unv = check_viability(word[j], letter_count, j);
+                    nn->unviable = unv;
+                    if (unv) break;
+                }
+                return;
+            }
+            current_node = n->next;
+            current_depth = i;
+            continue;
+        }
+        if (word[i] < n->letter) {
+            letter_node* nn = copy_node(n, i);
+            for (int j = 0; j < word_length - i; j++) {
+                int idx = j + i;
+                letter_node* k = &(current_node[idx - current_depth]);
+                letter_count[letter_to_index(word[idx])]++;
+                k->letter = word[idx];
+                k->unviable = check_viability(word[idx], letter_count, idx);
+                k->next = NULL;
+            }
+            n->next = nn;
+            return;
+        }
+        // already_unviable = already_unviable && n->unviable;
         letter_count[letter_to_index(word[i])]++;
-        if (i) {
-            // once the correct node is found, proceed with inserting the next one
-            // only after the first word
-            if (node->inner == NULL) {
-                node->inner = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
-            }
-            already_unviable = already_unviable && node->unviable;
-            parent = node;
-            node = node->inner;
-        }
-
-        while (node->letter != word[i]) {
-            // navigate through the letters until the correct one is either found or inserted
-
-            if (node->letter > word[i]) {
-                letter_node* nn = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
-                nn->next = node;
-                node = nn;
-                parent->inner = node;
-            } else if (node->next == NULL) {
-                node->next = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
-                node = node->next;
-            } else if (node->next->letter > word[i]) {
-                letter_node* nn = new_node(word[i], !already_unviable && check_viability(word[i], letter_count, i));
-                nn->next = node->next;
-                node->next = nn;
-                node = nn;
-            } else {
-                node = node->next;
-            }
-        }
+        i++;
     }
 }
 
@@ -100,7 +95,7 @@ bool check_viability(char letter, unsigned int* letter_count, int depth) {
         imposs = imposs->next;
     }
 
-    short d = 4 - depth;
+    short d = word_length - depth;
     for (int i = 0; i < 64; i++) {
         // check the minimum constraint
         // if there cannot possibly be enough letters to satisfy the minimum constraint, then the letter is unviable
@@ -114,34 +109,44 @@ bool check_viability(char letter, unsigned int* letter_count, int depth) {
     return false;
 }
 
-void clear_viability(letter_node* node) {
-    if (node == NULL)
-        return;
-    node->unviable = false;
-    clear_viability(node->inner);
-    clear_viability(node->next);
+void clear_viability(letter_node* node, unsigned depth) {
+    for (int i = 0; i < word_length - depth; i++) {
+        letter_node* n = &(node[i]);
+        n->unviable = false;
+        if (n->next) {
+            clear_viability(n->next, depth + i);
+        }
+    }
 }
 
 void update_viability_inner(letter_node* node, unsigned int* letter_count, int depth) {
-    if (node == NULL) {
-        viable_count++;
-        return;
-    }
-    while (node != NULL) {
-        unsigned short idx = letter_to_index(node->letter);
+    int i;
+    for (i = 0; i < word_length - depth; i++) {
+        letter_node* n = &(node[i]);
+        if (n->next) update_viability_inner(n->next, letter_count, depth + i);
+        unsigned short idx = letter_to_index(n->letter);
         letter_count[idx]++;
-        node->unviable = check_viability(node->letter, letter_count, depth);
-        if (!node->unviable) update_viability_inner(node->inner, letter_count, depth + 1);
+        bool unv = check_viability(n->letter, letter_count, depth + i);
+        n->unviable = unv;
+        if (unv)
+            break;
+    }
+    if (i == word_length - depth)
+        viable_count++;
+    else
+        i++;
+    // reset the letter_count table before returning
+    for (int j = 0; j < i; j++) {
+        letter_node n = node[j];
+        unsigned short idx = letter_to_index(n.letter);
         letter_count[idx]--;
-        node = node->next;
     }
 }
 
 void update_viability() {
     viable_count = 0;
-    letter_node* node = vocabulary;
     unsigned int letter_count[64] = {0};
-    update_viability_inner(node, letter_count, 0);
+    update_viability_inner(vocabulary, letter_count, 0);
 }
 
 /**
@@ -149,6 +154,24 @@ void update_viability() {
  */
 void print_words() {
     char* word = malloc(sizeof(char) * word_length + 1);
+    word[word_length] = '\0';
     print_inner(vocabulary, word, 0);
     free(word);
+}
+
+bool word_exists(char* word) {
+    letter_node* current_node = vocabulary;
+    unsigned current_depth = 0;
+    for (int i = 0; i < word_length; i++) {
+        char letter = word[i];
+        letter_node* node = &(current_node[i - current_depth]);
+        while (node->letter != letter) {
+            if (node->next == NULL)
+                return false;
+            current_node = node->next;
+            current_depth = i;
+            node = current_node;
+        }
+    }
+    return true;
 }
