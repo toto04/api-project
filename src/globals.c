@@ -12,4 +12,7 @@ unsigned int char_count[64];
 int guesses = 0;
 int viable_count = 0;
 
+// insert the char as the index and out comes the normalized index!
+unsigned short letter_lookup[256] = {0};
+
 #endif

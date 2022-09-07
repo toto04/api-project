@@ -1,3 +1,11 @@
+#ifndef UTILS
+#define UTILS
+
+#include <stdlib.h>
+#include <stdbool.h>
+
+#include "globals.c"
+
 /**
  * @brief takes the possible characters of the words and converts
  *
@@ -24,6 +32,12 @@ unsigned short letter_to_index(char c) {
         }
     }
     return c;
+}
+
+void initialize_letter_lookup() {
+    for (int i = 0; i < 256; i++) {
+        letter_lookup[i] = letter_to_index((char)i);
+    }
 }
 
 // char index_to_letter(unsigned short i) {
@@ -57,3 +71,5 @@ char* read_line() {
 
     return NULL;
 }
+
+#endif

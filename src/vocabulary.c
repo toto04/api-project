@@ -42,7 +42,7 @@ void append_word(char* word) {
                 n->next = new_node(&(word[i]), i);
                 for (int j = i; j < word_length; j++) {
                     letter_node* nn = &(n->next[j - i]);
-                    letter_count[letter_to_index(word[j])]++;
+                    letter_count[letter_lookup[(unsigned char)word[j]]]++;
                     bool unv = check_viability(word[j], letter_count, j);
                     nn->unviable = unv;
                     if (unv) break;
@@ -58,7 +58,7 @@ void append_word(char* word) {
             for (int j = 0; j < word_length - i; j++) {
                 int idx = j + i;
                 letter_node* k = &(current_node[idx - current_depth]);
-                letter_count[letter_to_index(word[idx])]++;
+                letter_count[letter_lookup[(unsigned char)word[idx]]]++;
                 k->letter = word[idx];
                 k->unviable = check_viability(word[idx], letter_count, idx);
                 k->next = NULL;
@@ -67,7 +67,7 @@ void append_word(char* word) {
             return;
         }
         // already_unviable = already_unviable && n->unviable;
-        letter_count[letter_to_index(word[i])]++;
+        letter_count[letter_lookup[(unsigned char)word[i]]]++;
         i++;
     }
 }
@@ -75,7 +75,7 @@ void append_word(char* word) {
 bool check_viability(char letter, unsigned int* letter_count, int depth) {
     if (!constraints.found_chars) return false;
 
-    unsigned short idx = letter_to_index(letter);
+    unsigned short idx = letter_lookup[(unsigned char)letter];
 
     // check absent constraint
     if (constraints.absent[idx]) {
@@ -95,7 +95,7 @@ bool check_viability(char letter, unsigned int* letter_count, int depth) {
         imposs = imposs->next;
     }
 
-    short d = word_length - depth;
+    short d = word_length - depth - 1;
     for (int i = 0; i < 64; i++) {
         // check the minimum constraint
         // if there cannot possibly be enough letters to satisfy the minimum constraint, then the letter is unviable
@@ -124,7 +124,7 @@ void update_viability_inner(letter_node* node, unsigned int* letter_count, int d
     for (i = 0; i < word_length - depth; i++) {
         letter_node* n = &(node[i]);
         if (n->next) update_viability_inner(n->next, letter_count, depth + i);
-        unsigned short idx = letter_to_index(n->letter);
+        unsigned short idx = letter_lookup[(unsigned char)n->letter];
         letter_count[idx]++;
         bool unv = check_viability(n->letter, letter_count, depth + i);
         n->unviable = unv;
@@ -138,7 +138,7 @@ void update_viability_inner(letter_node* node, unsigned int* letter_count, int d
     // reset the letter_count table before returning
     for (int j = 0; j < i; j++) {
         letter_node n = node[j];
-        unsigned short idx = letter_to_index(n.letter);
+        unsigned short idx = letter_lookup[(unsigned char)n.letter];
         letter_count[idx]--;
     }
 }

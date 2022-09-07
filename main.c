@@ -34,7 +34,7 @@ void parse_command(char* cmd) {
         for (int i = 0; i < 64; i++) char_count[i] = 0;
         for (int i = 0; i < word_length; i++) {
             char c = the_word[i];
-            unsigned short index = letter_to_index(c);
+            unsigned short index = letter_lookup[(unsigned char)c];
             char_count[index]++;
         }
 
@@ -58,6 +58,9 @@ void parse_command(char* cmd) {
 }
 
 int main(int argc, char* argv[]) {
+    // initialize the letter lookup table
+    initialize_letter_lookup();
+
     // firts thing: load the word length
     char* line = read_line();
     word_length = atoi(line);
@@ -80,7 +83,7 @@ int main(int argc, char* argv[]) {
                 for (unsigned int i = 0; i < word_length; i++) {
                     char c = line[i];
                     if (the_word[i] == c) {
-                        unsigned short index = letter_to_index(c);
+                        unsigned short index = letter_lookup[(unsigned char)c];
                         printed_char_count[index]++;  // count the letters
                         // set the constraint for the found letter
                         constraints.found_chars[i] = c;
@@ -92,7 +95,7 @@ int main(int argc, char* argv[]) {
                     char c = line[i];
                     if (the_word[i] == c) continue;  // already handled
 
-                    unsigned short idx = letter_to_index(c);
+                    unsigned short idx = letter_lookup[(unsigned char)c];
 
                     unsigned int lettercount = char_count[idx];
 
