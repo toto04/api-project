@@ -34,6 +34,10 @@ unsigned short letter_to_index(char c) {
     return c;
 }
 
+/**
+ * @brief initializes the letter lookup table using the letter_to_index function
+ * using such table is way faster than calling the function each time
+ */
 void initialize_letter_lookup() {
     for (int i = 0; i < 256; i++) {
         letter_lookup[i] = letter_to_index((char)i);
@@ -49,13 +53,6 @@ void initialize_letter_lookup() {
 //     if (i == 37)
 //         return '_';
 //     return i + 'a' - 38;
-// }
-
-// unsigned short* create_letter_table() {
-//     static unsigned short table[64];
-//     for (int i = 0; i < 64; i++)
-//         table[i] = 0;
-//     return table;
 // }
 
 /**
