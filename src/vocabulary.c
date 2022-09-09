@@ -32,13 +32,15 @@ bool check_viability(char letter, unsigned int* letter_count, int depth) {
 
     // each letter has to be checked couse the depth changes between checks
     short d = word_length - depth - 1;
-    for (int i = 0; i < 64; i++) {
-        // the minimum constraint has to be set, otherwise its useless to check anything
+    for (minimum_check_node* min = constraints.minimum_check_list; min != NULL; min = min->next) {
+        unsigned short i = min->index;
         if (constraints.minimum[i]) {
             // check the minimum constraint
             // if there cannot possibly be enough letters to satisfy the minimum constraint, then the letter is unviable
             if (letter_count[i] + d < constraints.minimum[i])
                 return true;
+            // for some reason, checking the exact constraint only if a minimum is set seems to
+            // improve performance
             // once the letter count passes the exact constraint, it is unviable
             if (letter_count[i] > constraints.exact[i])
                 return true;

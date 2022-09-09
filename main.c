@@ -35,6 +35,8 @@ void parse_command(char* cmd) {
         for (int i = 0; i < word_length; i++) {
             char c = the_word[i];
             unsigned short index = letter_lookup[(unsigned char)c];
+            if (char_count[index] == 0)
+                append_minimum_check(index);
             char_count[index]++;
         }
 
